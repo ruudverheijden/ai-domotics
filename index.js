@@ -113,7 +113,10 @@ function saveSwitchState (state) {
 
             // Save event to train model
             history.save(new Event('switch', state, {
-                hour: now.getHours(),
+                night: (now.getHours() >= 23 || now.getHours() < 5),
+                morning: (now.getHours() >= 5 && now.getHours() < 11),
+                afternoon: (now.getHours() >= 11 && now.getHours() < 17),
+                evening: (now.getHours() >= 17 && now.getHours() < 23),
                 weekend: (now.getDay() === 0 || now.getDay() === 1),
                 lightLevel: sensor.state.attributes.attributes.lightlevel
             }));
@@ -122,3 +125,5 @@ function saveSwitchState (state) {
 
     console.log('Event saved');
 }
+
+
