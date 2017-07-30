@@ -76,18 +76,26 @@ setInterval(function () {
                         case 1001 :
                         case 1002 :
                         case 1003 :
-                            _switch.lastUpdated = sensor.state.attributes.attributes.lastupdated;
-                            console.log('Pressed ON: ' + sensor.name + ' at ' + sensor.state.attributes.attributes.lastupdated);
-                            saveSwitchState(sensor.name, 1);
+                            if (_switch.lastState !== 'ON') {
+                                _switch.lastUpdated = sensor.state.attributes.attributes.lastupdated;
+                                _switch.lastState = 'ON';
+
+                                console.log('Pressed ON: ' + sensor.name + ' at ' + sensor.state.attributes.attributes.lastupdated);
+                                saveSwitchState(1);
+                            }
                             break;
 
                         case 4000 :
                         case 4001 :
                         case 4002 :
                         case 4003 :
-                            _switch.lastUpdated = sensor.state.attributes.attributes.lastupdated;
-                            console.log('Pressed OFF: ' + sensor.name + ' at ' + sensor.state.attributes.attributes.lastupdated);
-                            saveSwitchState(sensor.name, -1);
+                            if (_switch.lastState !== 'OFF') {
+                                _switch.lastUpdated = sensor.state.attributes.attributes.lastupdated;
+                                _switch.lastState = 'OFF';
+
+                                console.log('Pressed OFF: ' + sensor.name + ' at ' + sensor.state.attributes.attributes.lastupdated);
+                                saveSwitchState(-1);
+                            }
                             break;
                     }
                 }
@@ -96,7 +104,7 @@ setInterval(function () {
 }, 1000);
 
 
-function saveSwitchState (switchName, state) {
+function saveSwitchState (state) {
     const now = new Date();
 
     // Get current light level
@@ -104,12 +112,13 @@ function saveSwitchState (switchName, state) {
         .then(sensor => {
 
             // Save event to train model
-            history.save(new Event(switchName, state, {
+            history.save(new Event('switch', state, {
                 hour: now.getHours(),
-                weekDay: now.getDay(),
+                weekend: (now.getDay() === 0 || now.getDay() === 1),
                 lightLevel: sensor.state.attributes.attributes.lightlevel
             }));
 
-            console.log('Event saved for ' + switchName + ': Hour: ' + now.getHours() + ', Weekday: ' + now.getDay() + ' lightLevel: ' + sensor.state.attributes.attributes.lightlevel);
         });
+
+    console.log('Event saved');
 }
