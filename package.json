@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "huejay": "^1.5.0",
     "sqlite3": "^3.1.8",
     "svm": "^0.1.1"
   }
